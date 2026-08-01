@@ -4,154 +4,227 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mood Tracker &amp; Jurnal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #12151f;
-    --panel: #1b2030;
-    --panel2: #232940;
-    --text: #e8eaf2;
-    --muted: #9aa1b5;
-    --border: #2c3350;
-    --accent: #6c8cff;
-    --happy: #ffd166;
-    --good: #7ad17a;
-    --meh: #ffb570;
-    --low: #f28ba8;
-    --awful: #8f9bb3;
-    --radius: 14px;
+    --pink: #ffb7c5;
+    --peach: #ffd1b3;
+    --cream: #fff4e6;
+    --mint: #bde9d0;
+    --lav: #d9c7f2;
+    --sky: #b5d8f7;
+    --lemon: #fff0a8;
+    --ink: #5b4b66;
+    --ink2: #8a7a96;
+    --card: #ffffff;
+    --happy: #ffe79a;
+    --good: #a8e6cf;
+    --meh: #ffd7a0;
+    --low: #f9b5c0;
+    --awful: #c9b6e4;
+    --radius: 22px;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
-    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
-    background: radial-gradient(1200px 600px at 20% -10%, #232b47 0%, var(--bg) 55%);
-    color: var(--text);
+    font-family: "Quicksand", "Segoe UI", system-ui, sans-serif;
+    color: var(--ink);
     min-height: 100vh;
-    padding: 24px 16px 60px;
+    background:
+      radial-gradient(circle at 15% 20%, rgba(255,255,255,0.5) 2px, transparent 3px),
+      radial-gradient(circle at 40% 60%, rgba(255,255,255,0.5) 2px, transparent 3px),
+      radial-gradient(circle at 70% 30%, rgba(255,255,255,0.5) 2px, transparent 3px),
+      radial-gradient(circle at 85% 75%, rgba(255,255,255,0.5) 2px, transparent 3px),
+      radial-gradient(circle at 25% 85%, rgba(255,255,255,0.5) 2px, transparent 3px),
+      radial-gradient(circle at 60% 8%, rgba(255,255,255,0.5) 2px, transparent 3px),
+      radial-gradient(circle at 92% 50%, rgba(255,255,255,0.5) 2px, transparent 3px),
+      radial-gradient(circle at 8% 55%, rgba(255,255,255,0.5) 2px, transparent 3px),
+      radial-gradient(circle at 50% 95%, rgba(255,255,255,0.5) 2px, transparent 3px),
+      linear-gradient(135deg, #ffe9ef 0%, #fff0e6 25%, #eaf6ef 50%, #e9effc 75%, #f3eafa 100%);
+    background-size: 90px 90px, 110px 110px, 95px 95px, 105px 105px, 100px 100px, 115px 115px, 85px 85px, 108px 108px, 92px 92px, cover;
+    padding: 28px 16px 70px;
   }
   .wrap { max-width: 720px; margin: 0 auto; }
-  header { text-align: center; margin-bottom: 24px; }
-  header h1 { font-size: 1.7rem; letter-spacing: 0.5px; }
-  header p { color: var(--muted); margin-top: 6px; font-size: 0.95rem; }
-  .card {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 20px;
-    margin-bottom: 16px;
+  header { text-align: center; margin-bottom: 26px; }
+  header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    display: inline-block;
+    padding: 6px 22px;
+    background: rgba(255,255,255,0.65);
+    border-radius: 999px;
+    box-shadow: 0 6px 20px rgba(214, 175, 199, 0.25);
   }
-  .card h2 { font-size: 1rem; color: var(--muted); font-weight: 600; margin-bottom: 14px; text-transform: uppercase; letter-spacing: 1px; }
-  .moods { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+  header p { color: var(--ink2); margin-top: 10px; font-size: 0.98rem; font-weight: 500; }
+  .card {
+    background: rgba(255,255,255,0.82);
+    backdrop-filter: blur(6px);
+    border: 2px solid rgba(255,255,255,0.9);
+    border-radius: var(--radius);
+    padding: 22px;
+    margin-bottom: 18px;
+    box-shadow: 0 12px 30px rgba(203, 165, 199, 0.18);
+  }
+  .card h2 {
+    font-size: 0.95rem;
+    color: var(--ink2);
+    font-weight: 700;
+    margin-bottom: 16px;
+    letter-spacing: 0.5px;
+  }
+  .moods { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
   .mood {
-    background: var(--panel2);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 12px 6px;
+    background: #fff;
+    border: 2px solid transparent;
+    border-radius: 18px;
+    padding: 14px 6px;
     text-align: center;
     cursor: pointer;
-    transition: transform .12s, border-color .12s, background .12s;
+    transition: transform .15s, box-shadow .15s, border-color .15s;
+    box-shadow: 0 4px 12px rgba(203, 165, 199, 0.15);
   }
-  .mood:hover { transform: translateY(-2px); border-color: var(--accent); }
-  .mood.active { border-color: var(--accent); background: #28315a; }
-  .mood .emoji { font-size: 1.6rem; display: block; }
-  .mood .label { font-size: 0.72rem; color: var(--muted); margin-top: 6px; }
-  .mood.active .label { color: var(--text); }
-  .note { display: flex; flex-direction: column; gap: 10px; }
+  .mood:hover { transform: translateY(-4px) rotate(-2deg); box-shadow: 0 8px 18px rgba(203, 165, 199, 0.28); }
+  .mood.active {
+    border-color: var(--pink);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(255, 183, 197, 0.5);
+  }
+  .mood .emoji { font-size: 1.7rem; display: block; }
+  .mood .label { font-size: 0.72rem; font-weight: 600; color: var(--ink2); margin-top: 7px; }
+  .mood.active .label { color: var(--ink); }
+  .note { display: flex; flex-direction: column; gap: 12px; }
   textarea {
     width: 100%;
-    min-height: 100px;
-    background: var(--panel2);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    color: var(--text);
-    padding: 12px;
+    min-height: 105px;
+    background: #fff;
+    border: 2px solid #f3e3ee;
+    border-radius: 16px;
+    color: var(--ink);
+    padding: 14px;
     font-family: inherit;
     font-size: 0.95rem;
     resize: vertical;
+    box-shadow: inset 0 2px 6px rgba(214, 175, 199, 0.12);
   }
-  textarea:focus { outline: none; border-color: var(--accent); }
+  textarea:focus { outline: none; border-color: var(--pink); }
   button {
-    background: var(--accent);
+    font-family: inherit;
+    background: linear-gradient(135deg, var(--pink), #f69ec4);
     color: #fff;
     border: none;
-    border-radius: 10px;
-    padding: 12px 18px;
-    font-size: 0.95rem;
-    font-weight: 600;
+    border-radius: 999px;
+    padding: 13px 20px;
+    font-size: 0.98rem;
+    font-weight: 700;
     cursor: pointer;
-    transition: filter .12s;
+    box-shadow: 0 6px 16px rgba(246, 158, 196, 0.45);
+    transition: transform .12s, filter .12s;
   }
-  button:hover { filter: brightness(1.1); }
-  button.secondary { background: var(--panel2); border: 1px solid var(--border); }
-  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  button:hover { filter: brightness(1.05); transform: translateY(-2px); }
+  button:active { transform: translateY(0); }
+  button.secondary {
+    background: #fff;
+    color: var(--ink2);
+    border: 2px solid #f3e3ee;
+    box-shadow: none;
+    padding: 8px 14px;
+  }
+  button.secondary:hover { border-color: var(--pink); color: var(--ink); }
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
   .stat {
-    background: var(--panel2);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 14px;
+    background: #fff;
+    border-radius: 18px;
+    padding: 16px 10px;
     text-align: center;
+    box-shadow: 0 4px 14px rgba(203, 165, 199, 0.15);
   }
-  .stat .num { font-size: 1.4rem; font-weight: 700; }
-  .stat .name { font-size: 0.75rem; color: var(--muted); margin-top: 4px; }
-  .calendar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
-  .cal-head { text-align: center; font-size: 0.7rem; color: var(--muted); text-transform: uppercase; padding: 4px 0; }
+  .stat .num { font-size: 1.5rem; font-weight: 700; color: var(--pink); }
+  .stat .name { font-size: 0.76rem; color: var(--ink2); font-weight: 600; margin-top: 5px; }
+  .calendar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 7px; }
+  .cal-head { text-align: center; font-size: 0.7rem; color: var(--ink2); font-weight: 700; text-transform: uppercase; padding: 4px 0; }
   .day {
     aspect-ratio: 1;
-    background: var(--panel2);
-    border: 1px solid var(--border);
-    border-radius: 8px;
+    background: #fff;
+    border-radius: 14px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     position: relative;
-    transition: transform .12s, border-color .12s;
+    box-shadow: 0 3px 10px rgba(203, 165, 199, 0.12);
+    transition: transform .12s, box-shadow .12s;
   }
-  .day:hover { transform: scale(1.06); border-color: var(--accent); }
-  .day .dnum { font-size: 0.8rem; font-weight: 600; }
+  .day:hover { transform: scale(1.08) rotate(-2deg); box-shadow: 0 6px 16px rgba(203, 165, 199, 0.3); }
+  .day .dnum { font-size: 0.8rem; font-weight: 700; }
   .day .dmoji { font-size: 1rem; }
   .day.other { opacity: 0.25; }
-  .day.today { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
-  .journal-list { display: flex; flex-direction: column; gap: 10px; }
-  .entry {
-    background: var(--panel2);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 12px 14px;
-    display: flex;
-    gap: 12px;
-    align-items: flex-start;
+  .day.today {
+    border: 2px solid var(--pink);
+    box-shadow: 0 0 0 3px rgba(255, 183, 197, 0.35);
   }
-  .entry .emoji { font-size: 1.4rem; }
+  .day.selected { border: 2px dashed var(--lav); }
+  .journal-list { display: flex; flex-direction: column; gap: 12px; }
+  .entry {
+    background: #fff;
+    border-radius: 18px;
+    padding: 14px 16px;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    box-shadow: 0 4px 14px rgba(203, 165, 199, 0.14);
+  }
+  .entry .emoji {
+    font-size: 1.5rem;
+    width: 46px;
+    height: 46px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 14px;
+    flex-shrink: 0;
+  }
   .entry .body { flex: 1; min-width: 0; }
-  .entry .date { font-size: 0.75rem; color: var(--muted); }
-  .entry .text { margin-top: 4px; font-size: 0.92rem; white-space: pre-wrap; word-break: break-word; }
-  .entry .del { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 1rem; padding: 2px 6px; }
-  .entry .del:hover { color: #ff6b6b; }
-  .empty { color: var(--muted); text-align: center; padding: 20px 0; font-size: 0.9rem; }
-  .nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
-  .nav .month-label { font-size: 1.05rem; font-weight: 600; }
-  .nav button { padding: 6px 12px; font-size: 0.85rem; }
+  .entry .date { font-size: 0.75rem; color: var(--ink2); font-weight: 700; }
+  .entry .text { margin-top: 5px; font-size: 0.92rem; white-space: pre-wrap; word-break: break-word; }
+  .entry .del {
+    background: none;
+    border: none;
+    color: var(--ink2);
+    cursor: pointer;
+    font-size: 1.1rem;
+    padding: 4px 6px;
+    box-shadow: none;
+  }
+  .entry .del:hover { color: #f0708f; background: none; transform: none; }
+  .empty { color: var(--ink2); text-align: center; padding: 24px 0; font-size: 0.92rem; font-weight: 500; }
+  .nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+  .nav .month-label { font-size: 1.05rem; font-weight: 700; }
   .toast {
     position: fixed;
-    bottom: 24px;
+    bottom: 26px;
     left: 50%;
     transform: translateX(-50%) translateY(20px);
-    background: var(--panel2);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 12px 18px;
+    background: #fff;
+    border: 2px solid var(--pink);
+    border-radius: 999px;
+    padding: 12px 22px;
     font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--ink);
+    box-shadow: 0 10px 28px rgba(246, 158, 196, 0.4);
     opacity: 0;
     pointer-events: none;
     transition: opacity .25s, transform .25s;
     z-index: 99;
   }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-  .mood-key { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 10px; font-size: 0.78rem; color: var(--muted); }
+  .mood-key { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 14px; font-size: 0.8rem; font-weight: 600; color: var(--ink2); }
   @media (max-width: 480px) {
     .stats { grid-template-columns: repeat(3, 1fr); }
-    .mood .emoji { font-size: 1.3rem; }
+    .mood .emoji { font-size: 1.4rem; }
+    header h1 { font-size: 1.6rem; }
   }
 </style>
 </head>
@@ -165,7 +238,7 @@
   <section class="card">
     <h2>Hari ini: <span id="todayLabel"></span></h2>
     <div class="moods" id="moodPicker"></div>
-    <div style="height:14px"></div>
+    <div style="height:16px"></div>
     <div class="note">
       <textarea id="noteInput" placeholder="Tuliskan jurnalmu hari ini... (opsional)"></textarea>
       <button id="saveBtn">Simpan</button>
@@ -200,11 +273,11 @@
 "use strict";
 
 const MOODS = [
-  { key: "happy", emoji: "&#128513;", label: "Happy", color: "#ffd166" },
-  { key: "good",  emoji: "&#128578;", label: "Baik",  color: "#7ad17a" },
-  { key: "meh",   emoji: "&#128528;", label: "Biasa", color: "#ffb570" },
-  { key: "low",   emoji: "&#128532;", label: "Sedih", color: "#f28ba8" },
-  { key: "awful", emoji: "&#128557;", label: "Hancur", color: "#8f9bb3" }
+  { key: "happy", emoji: "&#128513;", label: "Happy", color: "#ffe79a" },
+  { key: "good",  emoji: "&#128578;", label: "Baik",  color: "#a8e6cf" },
+  { key: "meh",   emoji: "&#128528;", label: "Biasa", color: "#ffd7a0" },
+  { key: "low",   emoji: "&#128532;", label: "Sedih", color: "#f9b5c0" },
+  { key: "awful", emoji: "&#128557;", label: "Hancur", color: "#c9b6e4" }
 ];
 
 const MOOD_MAP = {};
@@ -286,7 +359,6 @@ function renderStats() {
     : 0;
   const total = entries.length;
   const journaled = entries.filter(([, v]) => v.note).length;
-  const moodNames = ["Hancur", "Sedih", "Biasa", "Baik", "Happy"];
 
   const items = [
     { num: happy + "/" + moods7.length, name: "Hari baik" },
@@ -312,7 +384,6 @@ function renderCalendar() {
   const firstDay = new Date(year, month, 1);
   const startOffset = (firstDay.getDay() + 6) % 7; // Senin = 0
   const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const prevMonthDays = new Date(year, month, 0).getDate();
 
   let html = "";
   const heads = ["Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min"];
@@ -346,7 +417,8 @@ function dayCell(d, isOther) {
   if (isOther) cls += " other";
   if (isToday) cls += " today";
   if (isSelected) cls += " selected";
-  return `<div class="${cls}" data-key="${key}" style="${rec && rec.mood ? `background:${MOOD_MAP[rec.mood].color}22` : ''}">
+  const bg = rec && rec.mood ? `background:${MOOD_MAP[rec.mood].color};` : "";
+  return `<div class="${cls}" data-key="${key}" style="${bg}">
     <span class="dnum">${d.getDate()}</span>
     <span class="dmoji">${emoji}</span>
   </div>`;
@@ -367,10 +439,11 @@ function renderJournal() {
     const rec = data[k];
     const el = document.createElement("div");
     el.className = "entry";
-    const mood = rec.mood ? `<span class="emoji">${MOOD_MAP[rec.mood].emoji}</span>` : `<span class="emoji">&#128278;</span>`;
+    const moodEmoji = rec.mood ? MOOD_MAP[rec.mood].emoji : "&#128278;";
+    const moodBg = rec.mood ? MOOD_MAP[rec.mood].color : "#f3e3ee";
     const d = parseKey(k);
     el.innerHTML = `
-      ${mood}
+      <span class="emoji" style="background:${moodBg}">${moodEmoji}</span>
       <div class="body">
         <div class="date">${fmtDate(d)}</div>
         <div class="text"></div>
