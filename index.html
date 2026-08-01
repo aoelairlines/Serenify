@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mood Tracker &amp; Jurnal</title>
+<style>
+  :root {
+    --bg: #12151f;
+    --panel: #1b2030;
+    --panel2: #232940;
+    --text: #e8eaf2;
+    --muted: #9aa1b5;
+    --border: #2c3350;
+    --accent: #6c8cff;
+    --happy: #ffd166;
+    --good: #7ad17a;
+    --meh: #ffb570;
+    --low: #f28ba8;
+    --awful: #8f9bb3;
+    --radius: 14px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: radial-gradient(1200px 600px at 20% -10%, #232b47 0%, var(--bg) 55%);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 24px 16px 60px;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; }
+  header { text-align: center; margin-bottom: 24px; }
+  header h1 { font-size: 1.7rem; letter-spacing: 0.5px; }
+  header p { color: var(--muted); margin-top: 6px; font-size: 0.95rem; }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .card h2 { font-size: 1rem; color: var(--muted); font-weight: 600; margin-bottom: 14px; text-transform: uppercase; letter-spacing: 1px; }
+  .moods { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+  .mood {
+    background: var(--panel2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 6px;
+    text-align: center;
+    cursor: pointer;
+    transition: transform .12s, border-color .12s, background .12s;
+  }
+  .mood:hover { transform: translateY(-2px); border-color: var(--accent); }
+  .mood.active { border-color: var(--accent); background: #28315a; }
+  .mood .emoji { font-size: 1.6rem; display: block; }
+  .mood .label { font-size: 0.72rem; color: var(--muted); margin-top: 6px; }
+  .mood.active .label { color: var(--text); }
+  .note { display: flex; flex-direction: column; gap: 10px; }
+  textarea {
+    width: 100%;
+    min-height: 100px;
+    background: var(--panel2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    padding: 12px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    resize: vertical;
+  }
+  textarea:focus { outline: none; border-color: var(--accent); }
+  button {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 12px 18px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: filter .12s;
+  }
+  button:hover { filter: brightness(1.1); }
+  button.secondary { background: var(--panel2); border: 1px solid var(--border); }
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .stat {
+    background: var(--panel2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px;
+    text-align: center;
+  }
+  .stat .num { font-size: 1.4rem; font-weight: 700; }
+  .stat .name { font-size: 0.75rem; color: var(--muted); margin-top: 4px; }
+  .calendar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+  .cal-head { text-align: center; font-size: 0.7rem; color: var(--muted); text-transform: uppercase; padding: 4px 0; }
+  .day {
+    aspect-ratio: 1;
+    background: var(--panel2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+    transition: transform .12s, border-color .12s;
+  }
+  .day:hover { transform: scale(1.06); border-color: var(--accent); }
+  .day .dnum { font-size: 0.8rem; font-weight: 600; }
+  .day .dmoji { font-size: 1rem; }
+  .day.other { opacity: 0.25; }
+  .day.today { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+  .journal-list { display: flex; flex-direction: column; gap: 10px; }
+  .entry {
+    background: var(--panel2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 14px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .entry .emoji { font-size: 1.4rem; }
+  .entry .body { flex: 1; min-width: 0; }
+  .entry .date { font-size: 0.75rem; color: var(--muted); }
+  .entry .text { margin-top: 4px; font-size: 0.92rem; white-space: pre-wrap; word-break: break-word; }
+  .entry .del { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 1rem; padding: 2px 6px; }
+  .entry .del:hover { color: #ff6b6b; }
+  .empty { color: var(--muted); text-align: center; padding: 20px 0; font-size: 0.9rem; }
+  .nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+  .nav .month-label { font-size: 1.05rem; font-weight: 600; }
+  .nav button { padding: 6px 12px; font-size: 0.85rem; }
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--panel2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 18px;
+    font-size: 0.9rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .25s, transform .25s;
+    z-index: 99;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .mood-key { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 10px; font-size: 0.78rem; color: var(--muted); }
+  @media (max-width: 480px) {
+    .stats { grid-template-columns: repeat(3, 1fr); }
+    .mood .emoji { font-size: 1.3rem; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>&#127770;&#65039; Mood Tracker &amp; Jurnal</h1>
+    <p>Catat suasana hatimu setiap hari dan tulis jurnal singkat.</p>
+  </header>
+
+  <section class="card">
+    <h2>Hari ini: <span id="todayLabel"></span></h2>
+    <div class="moods" id="moodPicker"></div>
+    <div style="height:14px"></div>
+    <div class="note">
+      <textarea id="noteInput" placeholder="Tuliskan jurnalmu hari ini... (opsional)"></textarea>
+      <button id="saveBtn">Simpan</button>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Ringkasan 7 Hari Terakhir</h2>
+    <div class="stats" id="stats"></div>
+    <div class="mood-key" id="moodKey"></div>
+  </section>
+
+  <section class="card">
+    <h2>Kalender Suasana Hati</h2>
+    <div class="nav">
+      <button class="secondary" id="prevMonth">&larr;</button>
+      <span class="month-label" id="monthLabel"></span>
+      <button class="secondary" id="nextMonth">&rarr;</button>
+    </div>
+    <div class="calendar" id="calendar"></div>
+  </section>
+
+  <section class="card">
+    <h2>Jurnal Terakhir</h2>
+    <div class="journal-list" id="journalList"></div>
+  </section>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+
+const MOODS = [
+  { key: "happy", emoji: "&#128513;", label: "Happy", color: "#ffd166" },
+  { key: "good",  emoji: "&#128578;", label: "Baik",  color: "#7ad17a" },
+  { key: "meh",   emoji: "&#128528;", label: "Biasa", color: "#ffb570" },
+  { key: "low",   emoji: "&#128532;", label: "Sedih", color: "#f28ba8" },
+  { key: "awful", emoji: "&#128557;", label: "Hancur", color: "#8f9bb3" }
+];
+
+const MOOD_MAP = {};
+MOODS.forEach(m => MOOD_MAP[m.key] = m);
+
+const STORE_KEY = "moodJournalData";
+const DAY_MS = 86400000;
+
+function loadData() {
+  try { return JSON.parse(localStorage.getItem(STORE_KEY)) || {}; }
+  catch { return {}; }
+}
+function saveData(data) {
+  localStorage.setItem(STORE_KEY, JSON.stringify(data));
+}
+
+function dateKey(d) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+function parseKey(k) {
+  const [y, m, d] = k.split("-").map(Number);
+  return new Date(y, m - 1, d);
+}
+function todayKey() { return dateKey(new Date()); }
+
+let data = loadData();
+let selectedMood = (data[todayKey()] && data[todayKey()].mood) || null;
+let currentMonth = new Date();
+currentMonth.setDate(1);
+let selectedDay = null;
+
+const $ = (id) => document.getElementById(id);
+
+function showToast(msg) {
+  const t = $("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove("show"), 1800);
+}
+
+function fmtDate(d) {
+  return d.toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+}
+
+function initMoodPicker() {
+  const picker = $("moodPicker");
+  picker.innerHTML = "";
+  MOODS.forEach(m => {
+    const el = document.createElement("div");
+    el.className = "mood" + (m.key === selectedMood ? " active" : "");
+    el.innerHTML = `<span class="emoji">${m.emoji}</span><span class="label">${m.label}</span>`;
+    el.addEventListener("click", () => {
+      selectedMood = m.key;
+      [...picker.children].forEach(c => c.classList.remove("active"));
+      el.classList.add("active");
+    });
+    picker.appendChild(el);
+  });
+}
+
+function updateTodayLabel() {
+  $("todayLabel").textContent = fmtDate(new Date());
+}
+
+function renderStats() {
+  const stats = $("stats");
+  const entries = Object.entries(data).filter(([k]) => {
+    const d = parseKey(k);
+    return d <= new Date() && d > new Date(Date.now() - 7 * DAY_MS);
+  });
+  const moods7 = entries.filter(([, v]) => v.mood);
+  const happy = moods7.filter(([, v]) => v.mood === "happy" || v.mood === "good").length;
+  const avg = moods7.length
+    ? MOODS.reduce((acc, m) => acc + MOODS.indexOf(m) * moods7.filter(([, v]) => v.mood === m.key).length, 0) / moods7.length
+    : 0;
+  const total = entries.length;
+  const journaled = entries.filter(([, v]) => v.note).length;
+  const moodNames = ["Hancur", "Sedih", "Biasa", "Baik", "Happy"];
+
+  const items = [
+    { num: happy + "/" + moods7.length, name: "Hari baik" },
+    { num: Math.round(avg * 10) / 10, name: "Mood rata-rata" },
+    { num: journaled + "/" + total, name: "Ada jurnal" }
+  ];
+  stats.innerHTML = items.map(s =>
+    `<div class="stat"><div class="num">${s.num}</div><div class="name">${s.name}</div></div>`
+  ).join("");
+  const keyHtml = MOODS.map(m =>
+    `<span style="color:${m.color}">${m.emoji} ${m.label}</span>`
+  ).join(" ");
+  $("moodKey").innerHTML = keyHtml;
+}
+
+function renderCalendar() {
+  const cal = $("calendar");
+  const year = currentMonth.getFullYear();
+  const month = currentMonth.getMonth();
+  const monthLabel = currentMonth.toLocaleDateString("id-ID", { month: "long", year: "numeric" });
+  $("monthLabel").textContent = monthLabel.charAt(0).toUpperCase() + monthLabel.slice(1);
+
+  const firstDay = new Date(year, month, 1);
+  const startOffset = (firstDay.getDay() + 6) % 7; // Senin = 0
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const prevMonthDays = new Date(year, month, 0).getDate();
+
+  let html = "";
+  const heads = ["Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min"];
+  heads.forEach(h => html += `<div class="cal-head">${h}</div>`);
+
+  for (let i = startOffset - 1; i >= 0; i--) {
+    const d = new Date(year, month, -i);
+    html += dayCell(d, true);
+  }
+  for (let day = 1; day <= daysInMonth; day++) {
+    const d = new Date(year, month, day);
+    html += dayCell(d, false);
+  }
+  const cells = startOffset + daysInMonth;
+  let next = 1;
+  while (cells + next <= 42) {
+    const d = new Date(year, month + 1, next);
+    html += dayCell(d, true);
+    next++;
+  }
+  cal.innerHTML = html;
+}
+
+function dayCell(d, isOther) {
+  const key = dateKey(d);
+  const rec = data[key];
+  const isToday = key === todayKey();
+  const isSelected = selectedDay === key;
+  const emoji = rec && rec.mood ? MOOD_MAP[rec.mood].emoji : "&#183;";
+  let cls = "day";
+  if (isOther) cls += " other";
+  if (isToday) cls += " today";
+  if (isSelected) cls += " selected";
+  return `<div class="${cls}" data-key="${key}" style="${rec && rec.mood ? `background:${MOOD_MAP[rec.mood].color}22` : ''}">
+    <span class="dnum">${d.getDate()}</span>
+    <span class="dmoji">${emoji}</span>
+  </div>`;
+}
+
+function renderJournal() {
+  const list = $("journalList");
+  const keys = Object.keys(data)
+    .filter(k => data[k] && data[k].note)
+    .sort((a, b) => b.localeCompare(a))
+    .slice(0, 10);
+  if (!keys.length) {
+    list.innerHTML = `<div class="empty">Belum ada jurnal. Mulai tulis catatan harianmu di atas. &#128172;</div>`;
+    return;
+  }
+  list.innerHTML = "";
+  keys.forEach(k => {
+    const rec = data[k];
+    const el = document.createElement("div");
+    el.className = "entry";
+    const mood = rec.mood ? `<span class="emoji">${MOOD_MAP[rec.mood].emoji}</span>` : `<span class="emoji">&#128278;</span>`;
+    const d = parseKey(k);
+    el.innerHTML = `
+      ${mood}
+      <div class="body">
+        <div class="date">${fmtDate(d)}</div>
+        <div class="text"></div>
+      </div>
+      <button class="del" title="Hapus">&#10005;</button>
+    `;
+    el.querySelector(".text").textContent = rec.note;
+    el.querySelector(".del").addEventListener("click", () => {
+      if (!confirm("Hapus jurnal ini?")) return;
+      delete data[k];
+      saveData(data);
+      renderAll();
+      showToast("Jurnal dihapus");
+    });
+    list.appendChild(el);
+  });
+}
+
+function renderAll() {
+  updateTodayLabel();
+  initMoodPicker();
+  renderStats();
+  renderCalendar();
+  renderJournal();
+}
+
+$("saveBtn").addEventListener("click", () => {
+  const note = $("noteInput").value.trim();
+  if (!selectedMood && !note) { showToast("Pilih mood atau tulis jurnal dulu ya"); return; }
+  const key = todayKey();
+  data[key] = { mood: selectedMood, note: note || (data[key] && data[key].note) || "" };
+  saveData(data);
+  renderAll();
+  showToast("Tersimpan! &#10003;");
+});
+
+$("prevMonth").addEventListener("click", () => {
+  currentMonth.setMonth(currentMonth.getMonth() - 1);
+  renderCalendar();
+});
+$("nextMonth").addEventListener("click", () => {
+  currentMonth.setMonth(currentMonth.getMonth() + 1);
+  renderCalendar();
+});
+
+$("calendar").addEventListener("click", (e) => {
+  const cell = e.target.closest(".day");
+  if (!cell) return;
+  selectedDay = cell.dataset.key;
+  renderCalendar();
+  const rec = data[selectedDay];
+  if (rec && rec.note) {
+    showToast(`Jurnal ${fmtDate(parseKey(selectedDay))}: "${rec.note.length > 40 ? rec.note.slice(0, 40) + "..." : rec.note}"`);
+  } else {
+    showToast(fmtDate(parseKey(selectedDay)) + " - belum ada catatan");
+  }
+});
+
+$("noteInput").value = (data[todayKey()] && data[todayKey()].note) || "";
+
+renderAll();
+</script>
+</body>
+</html>
