@@ -254,15 +254,17 @@
     position: fixed;
     z-index: 9999;
     pointer-events: none;
-    width: 22px;
-    height: 48px;
+    width: 40px;
+    height: 45px;
     margin-left: 0;
     margin-top: 0;
-    image-rendering: pixelated;
+    filter: drop-shadow(0 2px 3px rgba(43, 36, 64, 0.25));
     transition: transform .1s;
   }
-  .pcursor.large { transform: scale(1.35); }
+  .pcursor.large { transform: scale(1.2); }
+  .pcursor.hidden { opacity: 0; }
   .pcursor svg { width: 100%; height: 100%; display: block; }
+  input[type="date"], input[type="text"], input:not([type]), textarea { cursor: text; }
   @media (max-width: 480px) {
     .stats { grid-template-columns: repeat(3, 1fr); }
     .mood .emoji { font-size: 1.4rem; }
@@ -317,18 +319,28 @@
 <div class="toast" id="toast"></div>
 
 <div class="pcursor" id="pcursor">
-  <svg viewBox="0 0 28 68" shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg">
-    <g fill="#ffffff">
-      <rect x="5" y="5" width="4" height="4"/><rect x="9" y="5" width="4" height="4"/><rect x="5" y="9" width="4" height="4"/><rect x="9" y="9" width="4" height="4"/><rect x="13" y="9" width="4" height="4"/><rect x="5" y="13" width="4" height="4"/><rect x="9" y="13" width="4" height="4"/><rect x="13" y="13" width="4" height="4"/><rect x="17" y="13" width="4" height="4"/><rect x="5" y="17" width="4" height="4"/><rect x="9" y="17" width="4" height="4"/><rect x="13" y="17" width="4" height="4"/><rect x="17" y="17" width="4" height="4"/><rect x="21" y="17" width="4" height="4"/>
-      <rect x="9" y="21" width="4" height="4"/><rect x="13" y="21" width="4" height="4"/><rect x="17" y="21" width="4" height="4"/><rect x="21" y="21" width="4" height="4"/><rect x="13" y="25" width="4" height="4"/><rect x="17" y="25" width="4" height="4"/><rect x="21" y="25" width="4" height="4"/><rect x="17" y="29" width="4" height="4"/><rect x="21" y="29" width="4" height="4"/><rect x="1" y="33" width="4" height="4"/>
-      <rect x="9" y="1" width="4" height="4"/><rect x="13" y="1" width="4" height="4"/><rect x="13" y="5" width="4" height="4"/><rect x="17" y="9" width="4" height="4"/><rect x="21" y="13" width="4" height="4"/><rect x="5" y="25" width="4" height="4"/><rect x="9" y="25" width="4" height="4"/><rect x="1" y="29" width="4" height="4"/><rect x="5" y="29" width="4" height="4"/><rect x="9" y="29" width="4" height="4"/><rect x="1" y="33" width="4" height="4"/>
-    </g>
-    <g fill="#2b2440">
-      <rect x="6" y="6" width="4" height="4"/><rect x="10" y="6" width="4" height="4"/><rect x="6" y="10" width="4" height="4"/><rect x="10" y="10" width="4" height="4"/><rect x="14" y="10" width="4" height="4"/><rect x="6" y="14" width="4" height="4"/><rect x="10" y="14" width="4" height="4"/><rect x="14" y="14" width="4" height="4"/><rect x="18" y="14" width="4" height="4"/><rect x="6" y="18" width="4" height="4"/><rect x="10" y="18" width="4" height="4"/><rect x="14" y="18" width="4" height="4"/><rect x="18" y="18" width="4" height="4"/><rect x="22" y="18" width="4" height="4"/>
-      <rect x="10" y="22" width="4" height="4"/><rect x="14" y="22" width="4" height="4"/><rect x="18" y="22" width="4" height="4"/><rect x="22" y="22" width="4" height="4"/><rect x="14" y="26" width="4" height="4"/><rect x="18" y="26" width="4" height="4"/><rect x="22" y="26" width="4" height="4"/><rect x="18" y="30" width="4" height="4"/><rect x="22" y="30" width="4" height="4"/><rect x="26" y="26" width="4" height="4"/>
-      <rect x="26" y="22" width="4" height="4"/><rect x="10" y="2" width="4" height="4"/><rect x="14" y="2" width="4" height="4"/><rect x="14" y="6" width="4" height="4"/><rect x="18" y="10" width="4" height="4"/><rect x="22" y="14" width="4" height="4"/><rect x="6" y="26" width="4" height="4"/><rect x="10" y="26" width="4" height="4"/><rect x="2" y="30" width="4" height="4"/><rect x="6" y="30" width="4" height="4"/><rect x="10" y="30" width="4" height="4"/>
-    </g>
-    <rect x="10" y="10" width="4" height="4" fill="#ff81b0"/>
+  <svg viewBox="0 0 64 72" xmlns="http://www.w3.org/2000/svg">
+    <path d="M22 6c0-2 8-2 9 0-4 4-7 6-9 26h-2c0-10-4-18-10-22 3-3 8-4 12-4z" fill="#f3edf7"/>
+    <path d="M24 10c0-7 6-8 9-6 2 2 4 6 4 12 0 6-4 10-8 10-5 0-8-4-9-8l-2-6h1c3 0 5 0 5-2z" fill="#f3edf7"/>
+    <path d="M34 8a2 2 0 0 1 4 0c1 3 1 8-1 11-2 2-4 2-4 2-3-2-3-8 1-13z" fill="#f3edf7"/>
+    <ellipse cx="29" cy="14" rx="2.2" ry="5.5" fill="#ffc4d6" transform="rotate(-8 29 14)"/>
+    <ellipse cx="39" cy="13" rx="2.2" ry="5.5" fill="#ffc4d6" transform="rotate(10 39 13)"/>
+    <path d="M30 26h6v3l-3 3-3-3v-3z" fill="#e9dff0"/>
+    <ellipse cx="28" cy="30" rx="20" ry="18" fill="#fff" stroke="#e9dff0" stroke-width="2"/>
+    <ellipse cx="32" cy="32" rx="21" ry="18" fill="#f7f2fa" stroke="#efe6f5" stroke-width="2"/>
+    <path d="M23 28q3 2 6 0" stroke="#d9cce4" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <path d="M41 28q-3 2-6 0" stroke="#d9cce4" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <circle cx="22" cy="30" r="2.4" fill="#2b2440"/>
+    <circle cx="40" cy="30" r="2.4" fill="#2b2440"/>
+    <circle cx="22.8" cy="29.2" r="0.8" fill="#fff"/>
+    <circle cx="40.8" cy="29.2" r="0.8" fill="#fff"/>
+    <ellipse cx="18" cy="36" rx="4" ry="2.6" fill="#ffe1e7"/>
+    <ellipse cx="44" cy="36" rx="4" ry="2.6" fill="#ffe1e7"/>
+    <ellipse cx="32" cy="36" rx="1.6" ry="1.3" fill="#ff8db0"/>
+    <path d="M32 37v3" stroke="#ff8db0" stroke-width="1.6" stroke-linecap="round"/>
+    <path d="M28 39q4 3 8 0" stroke="#d9cce4" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+    <path d="M20 42q-5 2-9 1" stroke="#e3d7ec" stroke-width="1.6" stroke-linecap="round"/>
+    <path d="M44 42q5 2 9 1" stroke="#e3d7ec" stroke-width="1.6" stroke-linecap="round"/>
   </svg>
 </div>
 
@@ -593,13 +605,19 @@ $("todayChip").addEventListener("click", () => {
 $("noteInput").value = (data[activeKey] && data[activeKey].note) || "";
 
 const pcursor = $("pcursor");
+const textSel = "input[type='date'], input[type='text'], textarea";
 document.addEventListener("mousemove", (e) => {
   pcursor.style.left = e.clientX + "px";
   pcursor.style.top = e.clientY + "px";
 });
 const interactive = ".mood, .day, button, .chip, input, textarea, .entry, .del, a";
+const pcHoverable = ".mood, .day, button, .chip, .entry, .del, a";
 document.addEventListener("mouseover", (e) => {
-  pcursor.classList.toggle("large", !!e.target.closest(interactive));
+  pcursor.classList.toggle("large", !!e.target.closest(pcHoverable));
+  pcursor.classList.toggle("hidden", !!e.target.closest(textSel));
+});
+document.addEventListener("mouseout", (e) => {
+  if (e.target.closest && e.target.closest(textSel)) pcursor.classList.remove("hidden");
 });
 
 renderAll();
