@@ -31,6 +31,7 @@
     font-family: "Quicksand", "Segoe UI", system-ui, sans-serif;
     color: var(--ink);
     min-height: 100vh;
+    cursor: none;
     background:
       radial-gradient(circle at 15% 20%, rgba(255,255,255,0.5) 2px, transparent 3px),
       radial-gradient(circle at 40% 60%, rgba(255,255,255,0.5) 2px, transparent 3px),
@@ -221,6 +222,47 @@
   }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   .mood-key { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 14px; font-size: 0.8rem; font-weight: 600; color: var(--ink2); }
+  .date-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 16px; }
+  .date-row input[type="date"] {
+    font-family: inherit;
+    flex: 1;
+    min-width: 160px;
+    background: #fff;
+    border: 2px solid #f3e3ee;
+    border-radius: 999px;
+    color: var(--ink);
+    padding: 11px 16px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: none;
+  }
+  .date-row input[type="date"]:focus { outline: none; border-color: var(--pink); }
+  .chip {
+    background: #fff;
+    border: 2px solid #f3e3ee;
+    color: var(--ink2);
+    border-radius: 999px;
+    padding: 8px 14px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: none;
+    font-family: inherit;
+    transition: border-color .12s, color .12s;
+  }
+  .chip:hover { border-color: var(--pink); color: var(--ink); }
+  .pcursor {
+    position: fixed;
+    z-index: 9999;
+    pointer-events: none;
+    width: 28px;
+    height: 28px;
+    margin-left: -14px;
+    margin-top: -14px;
+    image-rendering: pixelated;
+    transition: transform .1s;
+  }
+  .pcursor.large { transform: scale(1.35); }
+  .pcursor svg { width: 100%; height: 100%; display: block; }
   @media (max-width: 480px) {
     .stats { grid-template-columns: repeat(3, 1fr); }
     .mood .emoji { font-size: 1.4rem; }
@@ -236,11 +278,16 @@
   </header>
 
   <section class="card">
-    <h2>Hari ini: <span id="todayLabel"></span></h2>
+    <h2>Isi Jurnal</h2>
+    <div class="date-row">
+      <input type="date" id="dateInput">
+      <button class="chip" id="todayChip">Hari ini</button>
+    </div>
+    <div id="dateLabel" style="font-weight:700;margin-bottom:12px;font-size:.95rem;"></div>
     <div class="moods" id="moodPicker"></div>
     <div style="height:16px"></div>
     <div class="note">
-      <textarea id="noteInput" placeholder="Tuliskan jurnalmu hari ini... (opsional)"></textarea>
+      <textarea id="noteInput" placeholder="Tuliskan jurnalmu untuk tanggal yang dipilih... (opsional)"></textarea>
       <button id="saveBtn">Simpan</button>
     </div>
   </section>
@@ -268,6 +315,29 @@
 </div>
 
 <div class="toast" id="toast"></div>
+
+<div class="pcursor" id="pcursor">
+  <svg viewBox="0 0 24 24" shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg">
+    <g fill="#fff">
+      <rect x="4" y="0" width="1" height="2"/><rect x="0" y="4" width="2" height="1"/>
+      <rect x="19" y="0" width="1" height="2"/><rect x="22" y="4" width="2" height="1"/>
+      <rect x="4" y="22" width="1" height="2"/><rect x="0" y="19" width="2" height="1"/>
+      <rect x="19" y="22" width="1" height="2"/><rect x="22" y="19" width="2" height="1"/>
+    </g>
+    <g fill="#2b2440">
+      <rect x="4" y="2" width="1" height="2"/><rect x="4" y="4" width="1" height="1"/><rect x="4" y="18" width="1" height="1"/><rect x="4" y="19" width="1" height="2"/>
+      <rect x="2" y="4" width="2" height="1"/><rect x="1" y="4" width="1" height="1"/><rect x="19" y="4" width="1" height="1"/><rect x="19" y="4" width="2" height="1"/>
+      <rect x="19" y="2" width="1" height="2"/><rect x="19" y="18" width="1" height="2"/><rect x="19" y="19" width="2" height="1"/>
+      <rect x="4" y="19" width="2" height="1"/><rect x="19" y="19" width="2" height="1"/>
+      <rect x="22" y="5" width="2" height="1"/><rect x="4" y="18" width="2" height="1"/>
+    </g>
+    <rect x="7" y="7" width="10" height="1" fill="#ff81b0"/>
+    <rect x="7" y="13" width="10" height="1" fill="#ff81b0"/>
+    <rect x="11" y="5" width="2" height="13" fill="#fff"/>
+    <rect x="10" y="4" width="4" height="16" rx="0" fill="#ff81b0" shape-rendering="crispEdges"/>
+    <rect x="5" y="10" width="14" height="4" fill="#ff81b0"/>
+  </svg>
+</div>
 
 <script>
 "use strict";
@@ -307,10 +377,11 @@ function parseKey(k) {
 function todayKey() { return dateKey(new Date()); }
 
 let data = loadData();
-let selectedMood = (data[todayKey()] && data[todayKey()].mood) || null;
+let activeKey = todayKey();
+let selectedMood = (data[activeKey] && data[activeKey].mood) || null;
 let currentMonth = new Date();
 currentMonth.setDate(1);
-let selectedDay = null;
+let selectedDay = activeKey;
 
 const $ = (id) => document.getElementById(id);
 
@@ -343,7 +414,10 @@ function initMoodPicker() {
 }
 
 function updateTodayLabel() {
-  $("todayLabel").textContent = fmtDate(new Date());
+  $("dateInput").value = activeKey;
+  $("dateLabel").textContent = activeKey === todayKey()
+    ? "&#128075; Hari ini: " + fmtDate(parseKey(activeKey))
+    : (activeKey < todayKey() ? "&#128197; " : "&#128204; ") + fmtDate(parseKey(activeKey));
 }
 
 function renderStats() {
@@ -473,7 +547,7 @@ function renderAll() {
 $("saveBtn").addEventListener("click", () => {
   const note = $("noteInput").value.trim();
   if (!selectedMood && !note) { showToast("Pilih mood atau tulis jurnal dulu ya"); return; }
-  const key = todayKey();
+  const key = activeKey;
   data[key] = { mood: selectedMood, note: note || (data[key] && data[key].note) || "" };
   saveData(data);
   renderAll();
@@ -492,8 +566,7 @@ $("nextMonth").addEventListener("click", () => {
 $("calendar").addEventListener("click", (e) => {
   const cell = e.target.closest(".day");
   if (!cell) return;
-  selectedDay = cell.dataset.key;
-  renderCalendar();
+  setActiveDate(cell.dataset.key);
   const rec = data[selectedDay];
   if (rec && rec.note) {
     showToast(`Jurnal ${fmtDate(parseKey(selectedDay))}: "${rec.note.length > 40 ? rec.note.slice(0, 40) + "..." : rec.note}"`);
@@ -502,7 +575,39 @@ $("calendar").addEventListener("click", (e) => {
   }
 });
 
-$("noteInput").value = (data[todayKey()] && data[todayKey()].note) || "";
+function setActiveDate(key) {
+  activeKey = key;
+  selectedDay = key;
+  selectedMood = (data[key] && data[key].mood) || null;
+  $("dateInput").value = key;
+  $("noteInput").value = (data[key] && data[key].note) || "";
+  const m = parseKey(key);
+  currentMonth = new Date(m.getFullYear(), m.getMonth(), 1);
+  renderAll();
+}
+
+$("dateInput").addEventListener("change", (e) => {
+  if (!e.target.value) return;
+  setActiveDate(e.target.value);
+  showToast("Tanggal dipilih: " + fmtDate(parseKey(e.target.value)));
+});
+
+$("todayChip").addEventListener("click", () => {
+  setActiveDate(todayKey());
+  renderAll();
+});
+
+$("noteInput").value = (data[activeKey] && data[activeKey].note) || "";
+
+const pcursor = $("pcursor");
+document.addEventListener("mousemove", (e) => {
+  pcursor.style.left = e.clientX + "px";
+  pcursor.style.top = e.clientY + "px";
+});
+const interactive = ".mood, .day, button, .chip, input, textarea, .entry, .del, a";
+document.addEventListener("mouseover", (e) => {
+  pcursor.classList.toggle("large", !!e.target.closest(interactive));
+});
 
 renderAll();
 </script>
